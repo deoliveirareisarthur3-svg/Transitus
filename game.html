@@ -220,8 +220,10 @@ function clickSquare(index) {
   if (gameOver) return;
 
   // Move the selected piece to a legal destination.
-  if (selected !== null &&
-      legalMoves(selected).includes(index)) {
+  if (
+    selected !== null &&
+    legalMoves(selected).includes(index)
+  ) {
     const from = selected;
     const destinationRow = Math.floor(index / 8);
 
@@ -230,8 +232,10 @@ function clickSquare(index) {
     selected = null;
 
     // Reaching the opposite end wins immediately.
-    if ((turn === "W" && destinationRow === 0) ||
-        (turn === "B" && destinationRow === 7)) {
+    if (
+      (turn === "W" && destinationRow === 0) ||
+      (turn === "B" && destinationRow === 7)
+    ) {
       gameOver = true;
       render();
       statusEl.textContent =
@@ -239,7 +243,28 @@ function clickSquare(index) {
       return;
     }
 
+    // Switch turns.
+    const lastPlayer = turn;
     turn = turn === "W" ? "B" : "W";
+
+    // Check whether the next player has any legal moves.
+    if (!hasMoves(turn)) {
+      gameOver = true;
+      render();
+
+      const lastPlayerName =
+        lastPlayer === "W" ? "White" : "Black";
+      const stuckPlayerName =
+        turn === "W" ? "White" : "Black";
+      const winnerName =
+        lastPlayer === "W" ? "Black" : "White";
+
+      statusEl.textContent =
+        stuckPlayerName + " has no legal moves. " +
+        lastPlayerName + " loses! " +
+        winnerName + " wins!";
+      return;
+    }
 
     render();
     return;
