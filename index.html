@@ -161,15 +161,15 @@
         square.className =
           "square " + ((row + col) % 2 === 0 ? "light" : "dark");
 
-        if (row === 0 || row === 1) {
-          const piece = document.createElement("div");
-          piece.className = "piece black-piece";
-          square.appendChild(piece);
-        } else if (row === 6 || row === 7) {
-          const piece = document.createElement("div");
-          piece.className = "piece white-piece";
-          square.appendChild(piece);
-        }
+       if (row === 0) {
+  const piece = document.createElement("div");
+  piece.className = "piece black-piece";
+  square.appendChild(piece);
+} else if (row === 7) {
+  const piece = document.createElement("div");
+  piece.className = "piece white-piece";
+  square.appendChild(piece);
+}
 
         board.appendChild(square);
       }
