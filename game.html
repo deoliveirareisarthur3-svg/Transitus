@@ -278,7 +278,7 @@ function clickSquare(index) {
     // The player who first causes a position to repeat starts
     // the repetition and is responsible under this rule.
     if (previousOccurrences === 1 && repetitionStarter === null) {
-      repetitionStarter = lastPlayer;
+      repetitionStarter = turn;
     }
 
     positionHistory.push(key);
