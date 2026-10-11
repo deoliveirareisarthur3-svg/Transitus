@@ -112,13 +112,17 @@ let board = [];
 let turn = "W";
 let selected = null;
 let gameOver = false;
+
 let positionHistory = [];
 let repetitionStarter = null;
+
+function positionKey() {
+  return board.map(piece => piece || "-").join("") + "|" + turn;
+}
 
 function resetGame() {
   board = Array(64).fill(null);
 
-  // Black starts at the top; White starts at the bottom.
   for (let col = 0; col < 8; col++) {
     board[col] = "B";
     board[56 + col] = "W";
@@ -127,6 +131,11 @@ function resetGame() {
   turn = "W";
   selected = null;
   gameOver = false;
+
+  // Reset repetition tracking and record the starting position.
+  positionHistory = [positionKey()];
+  repetitionStarter = null;
+
   render();
 }
 
@@ -135,7 +144,6 @@ function legalMoves(from) {
   const col = from % 8;
   const moves = [];
 
-  // Forward and sideways only: never backward or diagonal.
   const directions = turn === "W"
     ? [[-1, 0], [0, -1], [0, 1]]
     : [[1, 0], [0, -1], [0, 1]];
@@ -149,7 +157,6 @@ function legalMoves(from) {
 
     const destination = nextRow * 8 + nextCol;
 
-    // No capturing, jumping, or moving onto an occupied square.
     if (board[destination] === null) {
       moves.push(destination);
     }
@@ -221,13 +228,13 @@ function render() {
 function clickSquare(index) {
   if (gameOver) return;
 
-  // Move the selected piece to a legal destination.
   if (
     selected !== null &&
     legalMoves(selected).includes(index)
   ) {
     const from = selected;
     const destinationRow = Math.floor(index / 8);
+    const lastPlayer = turn;
 
     board[index] = board[from];
     board[from] = null;
@@ -246,24 +253,49 @@ function clickSquare(index) {
     }
 
     // Switch turns.
-    const lastPlayer = turn;
     turn = turn === "W" ? "B" : "W";
 
-    // Check whether the next player has any legal moves.
+    // No-legal-moves rule: the last player to move loses.
     if (!hasMoves(turn)) {
       gameOver = true;
       render();
 
-      const lastPlayerName =
-        lastPlayer === "W" ? "White" : "Black";
-      const stuckPlayerName =
-        turn === "W" ? "White" : "Black";
-      const winnerName =
-        lastPlayer === "W" ? "Black" : "White";
+      const stuckName = turn === "W" ? "White" : "Black";
+      const lastName = lastPlayer === "W" ? "White" : "Black";
+      const winnerName = lastPlayer === "W" ? "Black" : "White";
 
       statusEl.textContent =
-        stuckPlayerName + " has no legal moves. " +
-        lastPlayerName + " loses! " +
+        stuckName + " has no legal moves. " +
+        lastName + " loses! " + winnerName + " wins!";
+      return;
+    }
+
+    // Record the new position, including whose turn it is.
+    const key = positionKey();
+    const previousOccurrences =
+      positionHistory.filter(position => position === key).length;
+
+    // The player who first causes a position to repeat starts
+    // the repetition and is responsible under this rule.
+    if (previousOccurrences === 1 && repetitionStarter === null) {
+      repetitionStarter = lastPlayer;
+    }
+
+    positionHistory.push(key);
+
+    // A position appearing for the third time ends the game.
+    if (previousOccurrences >= 2) {
+      gameOver = true;
+      render();
+
+      const loserName =
+        repetitionStarter === "W" ? "White" : "Black";
+      const winnerName =
+        repetitionStarter === "W" ? "Black" : "White";
+
+      statusEl.textContent =
+        "Threefold repetition! " + loserName +
+        ", who started the repetition, loses. " +
         winnerName + " wins!";
       return;
     }
@@ -272,7 +304,6 @@ function clickSquare(index) {
     return;
   }
 
-  // Select only your own pieces.
   selected = board[index] === turn ? index : null;
   render();
 }
