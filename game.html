@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transitus — Play</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 24px 12px;
+  background: #10121b; color: #f4f5ff;
+  font-family: system-ui, sans-serif; text-align: center;
+}
+h1 { letter-spacing: 5px; margin-bottom: 6px; }
+p { color: #aeb5d0; }
+#status { font-weight: bold; margin: 18px; }
+#board {
+  width: min(90vw, 480px);
+  aspect-ratio: 1; margin: 20px auto;
+  display: grid; grid-template-columns: repeat(8, 1fr);
+  border: 3px solid #8793b4; border-radius: 5px;
+  overflow: hidden;
+}
+.square {
+  display: grid; place-items: center;
+  aspect-ratio: 1; cursor: pointer; position: relative;
+}
+.light { background: #d7dced; }
+.dark { background: #596783; }
+.piece {
+  width: 72%; height: 72%; border-radius: 50%;
+  box-shadow: 0 2px 5px #0005;
+}
+.white-piece { background: #fff; border: 3px solid #aab3ca; }
+.black-piece { background: #171923; border: 3px solid #8790a9; }
+.selected { outline: 4px solid #818cff; outline-offset: -4px; }
+.legal::after {
+  content: ""; position: absolute;
+  width: 22%; height: 22%; border-radius: 50%;
+  background: #777fff;
+}
+button {
+  background: #7b83ff; color: #10121b; border: 0;
+  border-radius: 9px; padding: 12px 20px;
+  font-weight: bold; cursor: pointer; margin: 8px;
+}
+a { color: #aab2ff; }
+</style>
+</head>
+<body>
+<h1>TRANSITUS</h1>
+<p>Think ahead. Reach the other side.</p>
+<div id="status">White's turn</div>
+<div id="board"></div>
+<button onclick="resetGame()">Restart Game</button>
+<p><a href="index.html">Back to homepage</a></p>
+
+<script>
+const boardEl = document.getElementById("board");
+const statusEl = document.getElementById("status");
+let board, turn, selected, gameOver;
+
+function resetGame() {
+  board = Array(64).fill(null);
+  for (let c = 0; c < 8; c++) {
+    board[c] = "B";
+    board[56 + c] = "W";
+  }
+  turn = "W";
+  selected = null;
+  gameOver = false;
+  render();
+}
+
+function legalMoves(from) {
+  const r = Math.floor(from / 8);
+  const c = from % 8;
+  const directions = [[-1,0],[0,-1],[0,1],[1,0]];
+  const moves = [];
+
+  for (const [dr, dc] of directions) {
+    const nr = r + dr, nc = c + dc;
+    if (nr < 0 || nr > 7 || nc < 0 || nc > 7) continue;
+    const to = nr * 8 + nc;
+    if (board[to] !== null) continue;
+
+    // Pieces cannot move backwards or diagonally.
+    if (turn === "W" && dr < 0) moves.push(to);
+    if (turn === "B" && dr > 0) moves.push(to);
+    if (dr === 0) moves.push(to);
+  }
+  return moves;
+}
+
+function hasMoves(color) {
+  for (let i = 0; i < 64; i++) {
+    if (board[i] !== color) continue;
+    const r = Math.floor(i / 8), c = i % 8;
+    for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+      const nr = r + dr, nc = c + dc;
+      if (nr < 0 || nr > 7 || nc < 0 || nc > 7) continue;
+      if (board[nr * 8 + nc] !== null) continue;
+      if (color === "W" && dr < 0) continue;
+      if (color === "B" && dr > 0) continue;
+      return true;
+    }
+  }
+  return false;
+}
+
+function render() {
+  boardEl.innerHTML = "";
+  const targets = selected === null ? [] : legalMoves(selected);
+
+  for (let i = 0; i < 64; i++) {
+    const sq = document.createElement("div");
+    sq.className = "square " +
+      ((Math.floor(i / 8) + i % 8) % 2 === 0 ? "light" : "dark");
+    if (i === selected) sq.classList.add("selected");
+    if (targets.includes(i)) sq.classList.add("legal");
+
+    if (board[i]) {
+      const piece = document.createElement("div");
+      piece.className = "piece " +
+        (board[i] === "W" ? "white-piece" : "black-piece");
+      sq.appendChild(piece);
+    }
+    sq.onclick = () => clickSquare(i);
+    boardEl.appendChild(sq);
+  }
+
+  if (gameOver) return;
+  statusEl.textContent = (turn === "W" ? "White" : "Black") + "'s turn";
+}
+
+function clickSquare(i) {
+  if (gameOver) return;
+
+  if (selected !== null && legalMoves(selected).includes(i)) {
+    const oldRow = Math.floor(selected / 8);
+    const newRow = Math.floor(i / 8);
+    board[i] = board[selected];
+    board[selected] = null;
+    selected = null;
+
+    if ((turn === "W" && newRow === 0) ||
+        (turn === "B" && newRow === 7)) {
+      gameOver = true;
+      render();
+      statusEl.textContent =
+        (turn === "W" ? "White" : "Black") + " wins!";
+      return;
+    }
+
+    turn = turn === "W" ? "B" : "W";
+    if (!hasMoves(turn)) {
+      gameOver = true;
+      render();
+      statusEl.textContent =
+        (turn === "W" ? "Black" : "White") + " wins!";
+      return;
+    }
+    render();
+    return;
+  }
+
+  if (board[i] === turn) {
+    selected = i;
+  } else {
+    selected = null;
+  }
+  render();
+}
+
+resetGame();
+</script>
+</body>
+</html>
