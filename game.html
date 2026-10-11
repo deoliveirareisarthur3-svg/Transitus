@@ -112,6 +112,8 @@ let board = [];
 let turn = "W";
 let selected = null;
 let gameOver = false;
+let positionHistory = [];
+let repetitionStarter = null;
 
 function resetGame() {
   board = Array(64).fill(null);
