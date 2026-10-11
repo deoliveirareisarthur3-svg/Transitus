@@ -1,2 +1,184 @@
-# Transitus
-A strategy game where every move matters
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transitus — Strategy Reimagined</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #10131c;
+      color: #f4f4f8;
+      text-align: center;
+    }
+
+    header {
+      padding: 24px 16px;
+      border-bottom: 1px solid #303646;
+      letter-spacing: 5px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 65px 20px 40px;
+    }
+
+    .tag {
+      color: #9ca8ff;
+      letter-spacing: 3px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 18px 0 12px;
+      font-size: clamp(44px, 10vw, 76px);
+      letter-spacing: 7px;
+    }
+
+    .subtitle {
+      color: #b8bdcc;
+      font-size: 17px;
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      width: min(88vw, 400px);
+      aspect-ratio: 1;
+      margin: 38px auto;
+      border: 3px solid #626b8a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .square {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      aspect-ratio: 1;
+      font-size: clamp(13px, 4vw, 25px);
+    }
+
+    .light {
+      background: #d5d9e8;
+    }
+
+    .dark {
+      background: #596581;
+    }
+
+    .piece {
+      width: 65%;
+      height: 65%;
+      border-radius: 50%;
+      box-shadow: 0 3px 5px #0005;
+    }
+
+    .white-piece {
+      background: #fff;
+      border: 3px solid #a7aec1;
+    }
+
+    .black-piece {
+      background: #171b27;
+      border: 3px solid #858da3;
+    }
+
+    .play-button {
+      display: inline-block;
+      padding: 16px 34px;
+      background: #7888ff;
+      color: #10131c;
+      font-size: 15px;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+    }
+
+    .play-button:hover {
+      background: #a1acff;
+    }
+
+    .note {
+      color: #9299ad;
+      font-size: 13px;
+      margin-top: 16px;
+    }
+
+    footer {
+      padding: 24px;
+      color: #737c93;
+      border-top: 1px solid #303646;
+      font-size: 12px;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <header>YOUR NEXT STRATEGY CHALLENGE</header>
+
+  <main>
+    <div class="tag">THINK. MOVE. CONQUER.</div>
+
+    <h1>TRANSITUS</h1>
+
+    <p class="subtitle">
+      An original strategy game where every move matters.
+      Plan ahead, outmaneuver your opponent, and reach the other side first.
+    </p>
+
+    <div class="board" id="board" aria-label="Transitus game board"></div>
+
+    <button class="play-button" onclick="showMessage()">
+      EXPLORE TRANSITUS
+    </button>
+
+    <p class="note" id="message">
+      8 × 8 BOARD · 16 PIECES · ONE WINNER
+    </p>
+  </main>
+
+  <footer>TRANSITUS · A STRATEGY GAME BY ITS CREATOR</footer>
+
+  <script>
+    const board = document.getElementById("board");
+
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 8; col++) {
+        const square = document.createElement("div");
+        square.className =
+          "square " + ((row + col) % 2 === 0 ? "light" : "dark");
+
+        if (row === 0 || row === 1) {
+          const piece = document.createElement("div");
+          piece.className = "piece black-piece";
+          square.appendChild(piece);
+        } else if (row === 6 || row === 7) {
+          const piece = document.createElement("div");
+          piece.className = "piece white-piece";
+          square.appendChild(piece);
+        }
+
+        board.appendChild(square);
+      }
+    }
+
+    function showMessage() {
+      document.getElementById("message").textContent =
+        "THE PLAYABLE GAME IS OUR NEXT MISSION!";
+    }
+  </script>
+</body>
+</html>
