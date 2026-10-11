@@ -1,314 +1,447 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Transitus — Play</title>
-<style>
-* { box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transitus</title>
 
-body {
-  margin: 0;
-  padding: 24px 12px;
-  background: #10121b;
-  color: #f4f5ff;
-  font-family: system-ui, sans-serif;
-  text-align: center;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-h1 { letter-spacing: 5px; margin-bottom: 6px; }
-p { color: #aeb5d0; }
+    body {
+      margin: 0;
+      padding: 24px 12px;
+      background: #151923;
+      color: #f4f4f5;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
 
-#status {
-  font-weight: bold;
-  margin: 18px;
-  min-height: 24px;
-}
+    h1 {
+      margin: 0 0 8px;
+      font-size: 42px;
+      letter-spacing: 5px;
+    }
 
-#board {
-  width: min(90vw, 480px);
-  aspect-ratio: 1;
-  margin: 20px auto;
-  display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  grid-template-rows: repeat(8, minmax(0, 1fr));
-  border: 3px solid #8793b4;
-  border-radius: 5px;
-  overflow: hidden;
-}
+    .subtitle {
+      color: #aab3c5;
+      margin: 0 0 22px;
+    }
 
-.square {
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  position: relative;
-}
+    #status {
+      min-height: 48px;
+      margin: 12px auto;
+      max-width: 500px;
+      font-size: 17px;
+      line-height: 1.5;
+    }
 
-.light { background: #d7dced; }
-.dark { background: #596783; }
+    #turnInfo {
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
 
-.piece {
-  width: 76%;
-  height: 76%;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px #0005;
-  pointer-events: none;
-}
+    #board {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      width: min(92vw, 520px);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      border: 4px solid #343b4d;
+      border-radius: 4px;
+      overflow: hidden;
+    }
 
-.white-piece {
-  background: #fff;
-  border: 3px solid #aab3ca;
-}
+    .square {
+      min-width: 0;
+      min-height: 0;
+      border: none;
+      border-radius: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      cursor: pointer;
+      position: relative;
+    }
 
-.black-piece {
-  background: #171923;
-  border: 3px solid #8790a9;
-}
+    .light {
+      background: #d7dce5;
+    }
 
-.selected {
-  box-shadow: inset 0 0 0 4px #818cff;
-}
+    .dark {
+      background: #758197;
+    }
 
-.legal::after {
-  content: "";
-  position: absolute;
-  width: 22%;
-  height: 22%;
-  border-radius: 50%;
-  background: #777fff;
-  pointer-events: none;
-}
+    .piece {
+      width: 68%;
+      height: 68%;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(12px, 3vw, 23px);
+      font-weight: bold;
+      box-shadow: 0 3px 5px #0005;
+      pointer-events: none;
+    }
 
-button {
-  background: #7b83ff;
-  color: #10121b;
-  border: 0;
-  border-radius: 9px;
-  padding: 12px 20px;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 8px;
-}
+    .white-piece {
+      background: #ffffff;
+      color: #222b3b;
+      border: 3px solid #aeb8c9;
+    }
 
-a { color: #aab2ff; }
-</style>
+    .black-piece {
+      background: #202635;
+      color: #ffffff;
+      border: 3px solid #59657a;
+    }
+
+    .selected {
+      outline: 4px solid #ffd34e;
+      outline-offset: -4px;
+      z-index: 1;
+    }
+
+    .legal::after {
+      content: "";
+      position: absolute;
+      width: 22%;
+      height: 22%;
+      border-radius: 50%;
+      background: #36a86b;
+      pointer-events: none;
+    }
+
+    .goal {
+      box-shadow: inset 0 0 0 3px #e6b94b;
+    }
+
+    .controls {
+      margin: 20px auto 10px;
+    }
+
+    button#restart {
+      padding: 12px 24px;
+      background: #e6b94b;
+      color: #1b1e27;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button#restart:hover {
+      background: #ffda70;
+    }
+
+    #moveInfo {
+      color: #aab3c5;
+      font-size: 14px;
+      margin-top: 12px;
+    }
+
+    .rules {
+      max-width: 520px;
+      margin: 24px auto 0;
+      padding: 16px;
+      background: #202635;
+      border-radius: 10px;
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    .rules h2 {
+      margin-top: 0;
+      font-size: 19px;
+    }
+
+    .rules ul {
+      padding-left: 22px;
+      margin-bottom: 0;
+    }
+  </style>
 </head>
+
 <body>
+  <h1>TRANSITUS</h1>
+  <p class="subtitle">A game of strategy and movement</p>
 
-<h1>TRANSITUS</h1>
-<p>Think ahead. Reach the other side.</p>
-<div id="status" aria-live="polite">White's turn</div>
-<div id="board" aria-label="Transitus game board"></div>
-<button onclick="resetGame()">Restart Game</button>
-<p><a href="index.html">Back to homepage</a></p>
+  <div id="turnInfo">White's turn</div>
+  <div id="status" aria-live="polite">
+    Move a piece one square forward or sideways.
+  </div>
 
-<script>
-const boardEl = document.getElementById("board");
-const statusEl = document.getElementById("status");
+  <div id="board" aria-label="Transitus game board"></div>
 
-let board = [];
-let turn = "W";
-let selected = null;
-let gameOver = false;
+  <div class="controls">
+    <button id="restart" type="button">Restart Game</button>
+  </div>
 
-let positionHistory = [];
-let repetitionStarter = null;
+  <div id="moveInfo">Full turns: 0 / 120</div>
 
-function positionKey() {
-  return board.map(piece => piece || "-").join("") + "|" + turn;
-}
+  <section class="rules">
+    <h2>Rules</h2>
+    <ul>
+      <li>Each player starts with 8 pieces on an 8×8 board.</li>
+      <li>White moves toward the top; Black moves toward the bottom.</li>
+      <li>Move one square forward or sideways. No diagonal or backward moves.</li>
+      <li>Pieces cannot jump over or capture other pieces.</li>
+      <li>Reach the opposite end of the board to win.</li>
+      <li>If a player has no legal moves, the last player to move loses.</li>
+      <li>If a position occurs three times, the player who started the repetition loses.</li>
+      <li>If 120 full turns pass without another result, the game is a draw.</li>
+    </ul>
+  </section>
 
-function resetGame() {
-  board = Array(64).fill(null);
+  <script>
+    const boardElement = document.getElementById("board");
+    const statusElement = document.getElementById("status");
+    const turnInfoElement = document.getElementById("turnInfo");
+    const moveInfoElement = document.getElementById("moveInfo");
+    const restartButton = document.getElementById("restart");
 
-  for (let col = 0; col < 8; col++) {
-    board[col] = "B";
-    board[56 + col] = "W";
-  }
+    let board = [];
+    let turn = "W";
+    let selected = null;
+    let gameOver = false;
+    let moveCount = 0;
 
-  turn = "W";
-  selected = null;
-  gameOver = false;
+    let positionHistory = [];
+    let repetitionStarter = null;
 
-  // Reset repetition tracking and record the starting position.
-  positionHistory = [positionKey()];
-  repetitionStarter = null;
-
-  render();
-}
-
-function legalMoves(from) {
-  const row = Math.floor(from / 8);
-  const col = from % 8;
-  const moves = [];
-
-  const directions = turn === "W"
-    ? [[-1, 0], [0, -1], [0, 1]]
-    : [[1, 0], [0, -1], [0, 1]];
-
-  for (const [dr, dc] of directions) {
-    const nextRow = row + dr;
-    const nextCol = col + dc;
-
-    if (nextRow < 0 || nextRow > 7 ||
-        nextCol < 0 || nextCol > 7) continue;
-
-    const destination = nextRow * 8 + nextCol;
-
-    if (board[destination] === null) {
-      moves.push(destination);
-    }
-  }
-
-  return moves;
-}
-
-function hasMoves(color) {
-  for (let i = 0; i < 64; i++) {
-    if (board[i] !== color) continue;
-
-    const row = Math.floor(i / 8);
-    const col = i % 8;
-
-    const directions = color === "W"
-      ? [[-1, 0], [0, -1], [0, 1]]
-      : [[1, 0], [0, -1], [0, 1]];
-
-    for (const [dr, dc] of directions) {
-      const r = row + dr;
-      const c = col + dc;
-
-      if (r < 0 || r > 7 || c < 0 || c > 7) continue;
-
-      if (board[r * 8 + c] === null) return true;
-    }
-  }
-
-  return false;
-}
-
-function render() {
-  boardEl.innerHTML = "";
-
-  const targets = selected === null
-    ? []
-    : legalMoves(selected);
-
-  for (let i = 0; i < 64; i++) {
-    const row = Math.floor(i / 8);
-    const col = i % 8;
-
-    const square = document.createElement("div");
-    square.className =
-      "square " + ((row + col) % 2 === 0 ? "light" : "dark");
-
-    if (i === selected) square.classList.add("selected");
-    if (targets.includes(i)) square.classList.add("legal");
-
-    if (board[i] !== null) {
-      const piece = document.createElement("div");
-      piece.className =
-        "piece " +
-        (board[i] === "W" ? "white-piece" : "black-piece");
-      square.appendChild(piece);
+    function positionKey() {
+      return board.map(piece => piece || "-").join("") + "|" + turn;
     }
 
-    square.addEventListener("click", () => clickSquare(i));
-    boardEl.appendChild(square);
-  }
+    function resetGame() {
+      board = Array(64).fill(null);
 
-  if (!gameOver) {
-    statusEl.textContent =
-      (turn === "W" ? "White" : "Black") + "'s turn";
-  }
-}
+      for (let col = 0; col < 8; col++) {
+        board[col] = "B";
+        board[56 + col] = "W";
+      }
 
-function clickSquare(index) {
-  if (gameOver) return;
+      turn = "W";
+      selected = null;
+      gameOver = false;
+      moveCount = 0;
 
-  if (
-    selected !== null &&
-    legalMoves(selected).includes(index)
-  ) {
-    const from = selected;
-    const destinationRow = Math.floor(index / 8);
-    const lastPlayer = turn;
+      positionHistory = [positionKey()];
+      repetitionStarter = null;
 
-    board[index] = board[from];
-    board[from] = null;
-    selected = null;
+      statusElement.textContent =
+        "Move a piece one square forward or sideways.";
 
-    // Reaching the opposite end wins immediately.
-    if (
-      (turn === "W" && destinationRow === 0) ||
-      (turn === "B" && destinationRow === 7)
-    ) {
-      gameOver = true;
       render();
-      statusEl.textContent =
-        (turn === "W" ? "White" : "Black") + " wins!";
-      return;
     }
 
-    // Switch turns.
-    turn = turn === "W" ? "B" : "W";
+    function legalMoves(from) {
+      const piece = board[from];
 
-    // No-legal-moves rule: the last player to move loses.
-    if (!hasMoves(turn)) {
+      if (!piece) return [];
+
+      const row = Math.floor(from / 8);
+      const col = from % 8;
+
+      const forward = piece === "W" ? -1 : 1;
+
+      const candidates = [
+        [row + forward, col],
+        [row, col - 1],
+        [row, col + 1]
+      ];
+
+      return candidates
+        .filter(([r, c]) =>
+          r >= 0 && r < 8 &&
+          c >= 0 && c < 8
+        )
+        .map(([r, c]) => r * 8 + c)
+        .filter(index => board[index] === null);
+    }
+
+    function hasMoves(color) {
+      for (let i = 0; i < 64; i++) {
+        if (board[i] === color && legalMoves(i).length > 0) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function endGame(message) {
       gameOver = true;
+      selected = null;
+      statusElement.textContent = message;
       render();
-
-      const stuckName = turn === "W" ? "White" : "Black";
-      const lastName = lastPlayer === "W" ? "White" : "Black";
-      const winnerName = lastPlayer === "W" ? "Black" : "White";
-
-      statusEl.textContent =
-        stuckName + " has no legal moves. " +
-        lastName + " loses! " + winnerName + " wins!";
-      return;
     }
 
-    // Record the new position, including whose turn it is.
-    const key = positionKey();
-    const previousOccurrences =
-      positionHistory.filter(position => position === key).length;
+    function clickSquare(index) {
+      if (gameOver) return;
 
-    // The player who first causes a position to repeat starts
-    // the repetition and is responsible under this rule.
-    if (previousOccurrences === 1 && repetitionStarter === null) {
-      repetitionStarter = turn;
+      if (selected !== null) {
+        const moves = legalMoves(selected);
+
+        if (moves.includes(index)) {
+          const movingPiece = board[selected];
+
+          board[index] = movingPiece;
+          board[selected] = null;
+          selected = null;
+          moveCount++;
+
+          // Reaching the opposite end wins immediately.
+          const row = Math.floor(index / 8);
+
+          if (
+            (movingPiece === "W" && row === 0) ||
+            (movingPiece === "B" && row === 7)
+          ) {
+            const winner = movingPiece === "W" ? "White" : "Black";
+            endGame(winner + " wins by reaching the opposite end!");
+            return;
+          }
+
+          const lastPlayer = turn;
+          turn = turn === "W" ? "B" : "W";
+
+          // No-move rule: the last player to move loses.
+          if (!hasMoves(turn)) {
+            const stuckName = turn === "W" ? "White" : "Black";
+            const lastName = lastPlayer === "W" ? "White" : "Black";
+
+            endGame(
+              stuckName + " has no legal moves. " +
+              lastName + ", the last player to move, loses! " +
+              stuckName + " wins!"
+            );
+            return;
+          }
+
+          // Check repetition using both the board and whose turn it is.
+          const key = positionKey();
+          const occurrences = positionHistory.filter(
+            position => position === key
+          ).length;
+
+          if (occurrences === 1 && repetitionStarter === null) {
+            // The player whose turn begins the repeating sequence loses.
+            repetitionStarter = turn;
+          }
+
+          positionHistory.push(key);
+
+          if (occurrences >= 2) {
+            const loser = repetitionStarter === "W" ? "White" : "Black";
+            const winner = repetitionStarter === "W" ? "Black" : "White";
+
+            endGame(
+              "Threefold repetition! " + loser +
+              ", who started the repetition, loses. " +
+              winner + " wins!"
+            );
+            return;
+          }
+
+          // 240 individual moves = 120 full turns.
+          if (moveCount >= 240) {
+            endGame("Draw! The 120-turn limit has been reached.");
+            return;
+          }
+
+          statusElement.textContent = "Choose a " +
+            (turn === "W" ? "White" : "Black") + " piece to move.";
+
+          render();
+          return;
+        }
+
+        // Clicking another one of your pieces selects it instead.
+        if (board[index] === turn) {
+          selected = index;
+          statusElement.textContent = "Choose a highlighted square.";
+          render();
+          return;
+        }
+
+        selected = null;
+        statusElement.textContent = "Move cancelled. Choose a piece.";
+        render();
+        return;
+      }
+
+      if (board[index] === turn) {
+        selected = index;
+        statusElement.textContent = "Choose a highlighted square.";
+        render();
+      } else {
+        statusElement.textContent = "Select one of your own pieces.";
+      }
     }
 
-    positionHistory.push(key);
+    function render() {
+      boardElement.innerHTML = "";
 
-    // A position appearing for the third time ends the game.
-    if (previousOccurrences >= 2) {
-      gameOver = true;
-      render();
+      const highlighted = selected === null
+        ? []
+        : legalMoves(selected);
 
-      const loserName =
-        repetitionStarter === "W" ? "White" : "Black";
-      const winnerName =
-        repetitionStarter === "W" ? "Black" : "White";
+      for (let i = 0; i < 64; i++) {
+        const row = Math.floor(i / 8);
+        const col = i % 8;
 
-      statusEl.textContent =
-        "Threefold repetition! " + loserName +
-        ", who started the repetition, loses. " +
-        winnerName + " wins!";
-      return;
+        const square = document.createElement("button");
+        square.type = "button";
+        square.className =
+          "square " + ((row + col) % 2 === 0 ? "light" : "dark");
+
+        square.setAttribute(
+          "aria-label",
+          "Row " + (row + 1) + ", column " + (col + 1) +
+          (board[i] ? ", " + (board[i] === "W" ? "White" : "Black") + " piece" : "")
+        );
+
+        if (row === 0 || row === 7) {
+          square.classList.add("goal");
+        }
+
+        if (selected === i) {
+          square.classList.add("selected");
+        }
+
+        if (highlighted.includes(i)) {
+          square.classList.add("legal");
+        }
+
+        if (board[i]) {
+          const piece = document.createElement("div");
+          piece.className = "piece " +
+            (board[i] === "W" ? "white-piece" : "black-piece");
+          piece.textContent = board[i];
+          square.appendChild(piece);
+        }
+
+        square.addEventListener("click", () => clickSquare(i));
+        boardElement.appendChild(square);
+      }
+
+      turnInfoElement.textContent = gameOver
+        ? "Game over"
+        : (turn === "W" ? "White's turn" : "Black's turn");
+
+      moveInfoElement.textContent =
+        "Full turns: " + Math.floor(moveCount / 2) + " / 120";
     }
 
-    render();
-    return;
-  }
+    restartButton.addEventListener("click", resetGame);
 
-  selected = board[index] === turn ? index : null;
-  render();
-}
-
-resetGame();
-</script>
+    resetGame();
+  </script>
 </body>
 </html>
