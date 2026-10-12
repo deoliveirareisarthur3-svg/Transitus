@@ -152,137 +152,113 @@
     </section>
   </main>
 
-  <script>
-    const personalities = [
-      {name:"Balanced", emoji:"⚖️",
-       desc:"Plays solid, balanced moves."},
-      {name:"Aggressive", emoji:"⚔️",
-       desc:"Pushes forward and pressures your position."},
-      {name:"Defensive", emoji:"🛡️",
-       desc:"Prioritizes safe positions."},
-      {name:"Trickster", emoji:"🎭",
-       desc:"Looks for surprising moves and traps."},
-      {name:"Sprinter", emoji:"🏃",
-       desc:"Rushes toward the opposite end."},
-      {name:"Random", emoji:"🎲",
-       desc:"Chooses randomly among legal moves."},
-      {name:"Tactician", emoji:"🧠",
-       desc:"Searches for tactical opportunities."},
-      {name:"Wall", emoji:"🧱",
-       desc:"Tries to obstruct your progress."},
-      {name:"Turtle", emoji:"🐢",
-       desc:"Moves cautiously and patiently."},
-      {name:"Predictor", emoji:"🔮",
-       desc:"Attempts to anticipate your next move."},
-      {name:"Repeater", emoji:"🔁",
-       desc:"Explores recurring positions and repetition."},
-      {name:"Teacher", emoji:"📚",
-       desc:"Will explain its moves when explanations are implemented."},
-      {name:"Chaos", emoji:"🌪️",
-       desc:"Prefers unusual, unpredictable legal moves."},
-      {name:"Champion", emoji:"👑",
-       desc:"Aiming for the strongest available play."}
-    ];
+<script>
+  const personalities = [
+    {name:"Balanced", emoji:"⚖️", desc:"Plays solid, balanced moves."},
+    {name:"Aggressive", emoji:"⚔️", desc:"Pushes forward and pressures your position."},
+    {name:"Defensive", emoji:"🛡️", desc:"Prioritizes safe positions."},
+    {name:"Trickster", emoji:"🎭", desc:"Looks for surprising moves and traps."},
+    {name:"Sprinter", emoji:"🏃", desc:"Rushes toward the opposite end."},
+    {name:"Random", emoji:"🎲", desc:"Chooses randomly among legal moves."},
+    {name:"Tactician", emoji:"🧠", desc:"Searches for tactical opportunities."},
+    {name:"Wall", emoji:"🧱", desc:"Tries to obstruct your progress."},
+    {name:"Turtle", emoji:"🐢", desc:"Moves cautiously and patiently."},
+    {name:"Predictor", emoji:"🔮", desc:"Attempts to anticipate your next move."},
+    {name:"Repeater", emoji:"🔁", desc:"Explores recurring positions and repetition."},
+    {name:"Teacher", emoji:"📚", desc:"Will explain its moves when explanations are implemented."},
+    {name:"Chaos", emoji:"🌪️", desc:"Prefers unusual, unpredictable legal moves."},
+    {name:"Champion", emoji:"👑", desc:"Aiming for the strongest available play."}
+  ];
 
-    let selected = "Balanced";
+  let selected = "Balanced";
+  let playerColor = "W";
 
-    const botsElement = document.getElementById("bots");
-    const ratingElement = document.getElementById("rating");
-    const eloElement = document.getElementById("elo");
-    const difficultyElement = document.getElementById("difficulty");
+  const botsElement = document.getElementById("bots");
+  const ratingElement = document.getElementById("rating");
+  const eloElement = document.getElementById("elo");
+  const difficultyElement = document.getElementById("difficulty");
+  const statusElement = document.getElementById("status");
+  const colorButtons = document.querySelectorAll("#colors button");
 
-    function getDifficulty(elo) {
-      if (elo < 500) return "Very Easy";
-      if (elo < 1000) return "Medium";
-      if (elo < 1500) return "Intermediate";
-      if (elo < 2000) return "Hard";
-      if (elo < 2500) return "Very Hard";
-      if (elo < 3000) return "Expert";
-      if (elo < 3500) return "Master";
-      return "Maximum";
-    }
+  function getDifficulty(elo) {
+    if (elo < 500) return "Very Easy";
+    if (elo < 1000) return "Medium";
+    if (elo < 1500) return "Intermediate";
+    if (elo < 2000) return "Hard";
+    if (elo < 2500) return "Very Hard";
+    if (elo < 3000) return "Expert";
+    if (elo < 3500) return "Master";
+    return "Maximum";
+  }
 
-    function selectBot(name) {
-      selected = name;
-      renderBots();
-      updateSummary();
-    }
-
-    function renderBots() {
-      botsElement.innerHTML = "";
-
-      personalities.forEach(bot => {
-        const button = document.createElement("button");
-        button.className = "bot" +
-          (selected === bot.name ? " selected" : "");
-        button.innerHTML =
-          '<span class="emoji">' + bot.emoji + '</span>' +
-          '<strong>' + bot.name + '</strong>' +
-          '<div class="description">' + bot.desc + '</div>';
-
-        button.setAttribute("aria-pressed",
-          String(selected === bot.name));
-        button.addEventListener("click", () => selectBot(bot.name));
-        botsElement.appendChild(button);
-      });
-    }
-
-    function updateSummary() {
-      const bot = personalities.find(b => b.name === selected);
-      const elo = Number(ratingElement.value);
-
-      eloElement.textContent = elo;
-      difficultyElement.textContent = getDifficulty(elo);
-      document.getElementById("summary").textContent =
-        selected + " Bot · " + elo + " Elo";
-      document.getElementById("description").textContent = bot.desc;
-    }
-
-    ratingElement.addEventListener("input", updateSummary);
-
-
-let playerColor = "W";
-
-const colorButtons = document.querySelectorAll("#colors button");
-
-colorButtons.forEach(button => {
-  button.addEventListener("click", function () {
-    playerColor = this.dataset.color;
-
-    colorButtons.forEach(option => {
-      option.classList.remove("selected");
-    });
-
-    this.classList.add("selected");
-
-    document.getElementById("status").textContent =
-      "You selected " +
-      (playerColor === "W" ? "White" : "Black") +
-      ".";
-  });
-});
-
-document.getElementById("play").addEventListener("click", () => {
-  const settings = new URLSearchParams({
-    personality: selected,
-    elo: String(Number(ratingElement.value)),
-    color: playerColor
-  });
-
-  window.location.href = "game.html?" + settings.toString();
-});
-  const elo = Number(ratingElement.value);
-
-  const settings = new URLSearchParams({
-    personality: selected,
-    elo: String(elo)
-  });
-
-  window.location.href = "game.html?" + settings.toString();
-});
-
+  function selectBot(name) {
+    selected = name;
     renderBots();
     updateSummary();
-  </script>
+  }
+
+  function renderBots() {
+    botsElement.innerHTML = "";
+
+    personalities.forEach(bot => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "bot" +
+        (selected === bot.name ? " selected" : "");
+
+      button.innerHTML =
+        '<span class="emoji">' + bot.emoji + '</span>' +
+        '<strong>' + bot.name + '</strong>' +
+        '<div class="description">' + bot.desc + '</div>';
+
+      button.setAttribute("aria-pressed", String(selected === bot.name));
+      button.addEventListener("click", () => selectBot(bot.name));
+      botsElement.appendChild(button);
+    });
+  }
+
+  function updateSummary() {
+    const bot = personalities.find(b => b.name === selected);
+    const elo = Number(ratingElement.value);
+
+    eloElement.textContent = elo;
+    difficultyElement.textContent = getDifficulty(elo);
+
+    document.getElementById("summary").textContent =
+      selected + " Bot · " + elo + " Elo";
+
+    document.getElementById("description").textContent = bot.desc;
+  }
+
+  ratingElement.addEventListener("input", updateSummary);
+
+  colorButtons.forEach(button => {
+    button.addEventListener("click", function () {
+      playerColor = this.dataset.color;
+
+      colorButtons.forEach(option => {
+        const isSelected = option === this;
+        option.classList.toggle("selected", isSelected);
+        option.setAttribute("aria-pressed", String(isSelected));
+      });
+
+      statusElement.textContent =
+        "You selected " + (playerColor === "W" ? "White" : "Black") + ".";
+    });
+  });
+
+  document.getElementById("play").addEventListener("click", () => {
+    const settings = new URLSearchParams({
+      personality: selected,
+      elo: String(Number(ratingElement.value)),
+      color: playerColor
+    });
+
+    window.location.href = "game.html?" + settings.toString();
+  });
+
+  renderBots();
+  updateSummary();
+</script>
 </body>
 </html>
