@@ -240,15 +240,25 @@
 
     ratingElement.addEventListener("input", updateSummary);
 
-    let playerColor = "W";
 
-document.querySelectorAll("#colors .bot").forEach(button => {
-  button.addEventListener("click", () => {
-    playerColor = button.dataset.color;
+let playerColor = "W";
 
-    document.querySelectorAll("#colors .bot").forEach(option => {
-      option.classList.toggle("selected", option === button);
+const colorButtons = document.querySelectorAll("#colors button");
+
+colorButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    playerColor = this.dataset.color;
+
+    colorButtons.forEach(option => {
+      option.classList.remove("selected");
     });
+
+    this.classList.add("selected");
+
+    document.getElementById("status").textContent =
+      "You selected " +
+      (playerColor === "W" ? "White" : "Black") +
+      ".";
   });
 });
 
