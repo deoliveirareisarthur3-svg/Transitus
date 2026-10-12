@@ -224,11 +224,16 @@
     const moveInfoElement = document.getElementById("moveInfo");
     const restartButton = document.getElementById("restart");
 
-    let board = [];
-    let turn = "W";
-    let selected = null;
-    let gameOver = false;
-    let moveCount = 0;
+ const params = new URLSearchParams(window.location.search);
+const botMode = params.has("personality");
+const playerColor = params.get("color") === "B" ? "B" : "W";
+const botColor = playerColor === "W" ? "B" : "W";
+
+let board = [];
+let turn = "W";
+let selected = null;
+let gameOver = false;
+let moveCount = 0;
 
     let positionHistory = [];
     let repetitionStarter = null;
