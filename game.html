@@ -126,6 +126,21 @@
     .controls {
       margin: 20px auto 10px;
     }
+    .home-button {
+  display: inline-block;
+  margin: 0 0 16px;
+  padding: 12px 24px;
+  background: #30384d;
+  color: #f4f4f5;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.home-button:hover {
+  background: #424d66;
+}
 
     button#restart {
       padding: 12px 24px;
@@ -173,6 +188,7 @@
 <body>
   <h1>TRANSITUS</h1>
   <p class="subtitle">A game of strategy and movement</p>
+  <a href="index.html" class="home-button">← Back to Home</a>
 
   <div id="turnInfo">White's turn</div>
   <div id="status" aria-live="polite">
