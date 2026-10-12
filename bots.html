@@ -232,27 +232,22 @@
 
   ratingElement.addEventListener("input", updateSummary);
 
-  colorButtons.forEach(button => {
-    button.addEventListener("click", function () {
-      playerColor = this.dataset.color;
-
-     colorButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    playerColor = button.dataset.color;
+colorButtons.forEach(button => {
+  button.addEventListener("click", function () {
+    playerColor = this.dataset.color;
 
     colorButtons.forEach(option => {
-      const active = option.dataset.color === playerColor;
-
-      option.classList.toggle("selected", active);
-      option.setAttribute("aria-pressed", String(active));
+      const isSelected = option === this;
+      option.classList.toggle("selected", isSelected);
+      option.setAttribute("aria-pressed", String(isSelected));
     });
 
     statusElement.textContent =
-      "You selected " +
-      (playerColor === "W" ? "White" : "Black") +
-      ". Click Play Against Bot when you're ready.";
+      "You selected " + (playerColor === "W" ? "White" : "Black") + ".";
   });
 });
+
+  
   document.getElementById("play").addEventListener("click", () => {
     const settings = new URLSearchParams({
       personality: selected,
