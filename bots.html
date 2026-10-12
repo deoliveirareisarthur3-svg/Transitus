@@ -236,17 +236,23 @@
     button.addEventListener("click", function () {
       playerColor = this.dataset.color;
 
-      colorButtons.forEach(option => {
-        const isSelected = option === this;
-        option.classList.toggle("selected", isSelected);
-        option.setAttribute("aria-pressed", String(isSelected));
-      });
+     colorButtons.forEach(button => {
+  button.addEventListener("click", () => {
+    playerColor = button.dataset.color;
 
-      statusElement.textContent =
-        "You selected " + (playerColor === "W" ? "White" : "Black") + ".";
+    colorButtons.forEach(option => {
+      const active = option.dataset.color === playerColor;
+
+      option.classList.toggle("selected", active);
+      option.setAttribute("aria-pressed", String(active));
     });
-  });
 
+    statusElement.textContent =
+      "You selected " +
+      (playerColor === "W" ? "White" : "Black") +
+      ". Click Play Against Bot when you're ready.";
+  });
+});
   document.getElementById("play").addEventListener("click", () => {
     const settings = new URLSearchParams({
       personality: selected,
