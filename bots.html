@@ -111,7 +111,22 @@
       <h2>Choose a personality</h2>
       <div class="bots" id="bots"></div>
     </section>
-
+    
+<section class="panel">
+  <h2>Choose your color</h2>
+  <div class="bots" id="colors">
+    <button type="button" class="bot selected" data-color="W">
+      <span class="emoji">⚪</span>
+      <strong>White</strong>
+      <div class="description">You move first</div>
+    </button>
+    <button type="button" class="bot" data-color="B">
+      <span class="emoji">⚫</span>
+      <strong>Black</strong>
+      <div class="description">Bot moves first</div>
+    </button>
+  </div>
+</section>
     <section class="panel">
       <h2>Bot strength</h2>
       <div class="rating"><span id="elo">750</span> Elo</div>
@@ -225,7 +240,27 @@
 
     ratingElement.addEventListener("input", updateSummary);
 
-    document.getElementById("play").addEventListener("click", () => {
+    let playerColor = "W";
+
+document.querySelectorAll("#colors .bot").forEach(button => {
+  button.addEventListener("click", () => {
+    playerColor = button.dataset.color;
+
+    document.querySelectorAll("#colors .bot").forEach(option => {
+      option.classList.toggle("selected", option === button);
+    });
+  });
+});
+
+document.getElementById("play").addEventListener("click", () => {
+  const settings = new URLSearchParams({
+    personality: selected,
+    elo: String(Number(ratingElement.value)),
+    color: playerColor
+  });
+
+  window.location.href = "game.html?" + settings.toString();
+});
   const elo = Number(ratingElement.value);
 
   const settings = new URLSearchParams({
