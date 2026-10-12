@@ -226,10 +226,15 @@
     ratingElement.addEventListener("input", updateSummary);
 
     document.getElementById("play").addEventListener("click", () => {
-      document.getElementById("status").textContent =
-        "Next step: connect the selected bot and rating to game.html. " +
-        "No AI game has started yet.";
-    });
+  const elo = Number(ratingElement.value);
+
+  const settings = new URLSearchParams({
+    personality: selected,
+    elo: String(elo)
+  });
+
+  window.location.href = "game.html?" + settings.toString();
+});
 
     renderBots();
     updateSummary();
