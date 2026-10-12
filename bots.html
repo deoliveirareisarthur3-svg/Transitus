@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transitus - Bot Arena</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #10131c;
+      color: #f4f6ff;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    h1 { text-align: center; font-size: 38px; }
+    .subtitle {
+      text-align: center;
+      color: #aab2c8;
+      margin-bottom: 30px;
+    }
+
+    .panel {
+      background: #1b2030;
+      border: 1px solid #343c52;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .bots {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 12px;
+    }
+
+    .bot {
+      background: #252c40;
+      color: white;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      padding: 17px 10px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .bot:hover { background: #303a54; }
+    .bot.selected {
+      border-color: #72a7ff;
+      background: #293d60;
+    }
+
+    .emoji { display: block; font-size: 30px; margin-bottom: 8px; }
+    .description { color: #aab2c8; font-size: 12px; margin-top: 7px; }
+
+    .rating {
+      font-size: 38px;
+      text-align: center;
+      font-weight: bold;
+      margin: 20px 0 8px;
+    }
+
+    input[type="range"] { width: 100%; cursor: pointer; }
+
+    .scale {
+      display: flex;
+      justify-content: space-between;
+      color: #aab2c8;
+      font-size: 12px;
+    }
+
+    .difficulty {
+      text-align: center;
+      margin: 20px 0 5px;
+      font-size: 20px;
+      color: #83b4ff;
+    }
+
+    .play, .home {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+
+    .play { background: #72a7ff; color: #10131c; }
+    .play:hover { background: #94bdff; }
+    .home { background: #30384d; color: white; margin-top: 12px; }
+    .note { color: #aab2c8; font-size: 13px; text-align: center; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>🤖 Bot Arena</h1>
+    <p class="subtitle">Choose your opponent. Test your Transitus skills.</p>
+
+    <section class="panel">
+      <h2>Choose a personality</h2>
+      <div class="bots" id="bots"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Bot strength</h2>
+      <div class="rating"><span id="elo">750</span> Elo</div>
+      <input id="rating" type="range" min="100" max="4000"
+             step="50" value="750"
+             aria-label="Bot Elo rating">
+      <div class="scale">
+        <span>100</span><span>1000</span><span>2000</span>
+        <span>3000</span><span>4000</span>
+      </div>
+      <div class="difficulty" id="difficulty">Medium</div>
+      <p class="note">Difficulty is determined by the selected Elo rating.</p>
+    </section>
+
+    <section class="panel">
+      <h2 id="summary">Balanced Bot · 750 Elo</h2>
+      <p id="description">Plays solid, balanced moves.</p>
+      <button class="play" id="play">Play Against Bot</button>
+      <a class="home" href="index.html">← Back to Home</a>
+      <p class="note" id="status">
+        Bot selection is ready. The AI opponent will be connected next.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const personalities = [
+      {name:"Balanced", emoji:"⚖️",
+       desc:"Plays solid, balanced moves."},
+      {name:"Aggressive", emoji:"⚔️",
+       desc:"Pushes forward and pressures your position."},
+      {name:"Defensive", emoji:"🛡️",
+       desc:"Prioritizes safe positions."},
+      {name:"Trickster", emoji:"🎭",
+       desc:"Looks for surprising moves and traps."},
+      {name:"Sprinter", emoji:"🏃",
+       desc:"Rushes toward the opposite end."},
+      {name:"Random", emoji:"🎲",
+       desc:"Chooses randomly among legal moves."},
+      {name:"Tactician", emoji:"🧠",
+       desc:"Searches for tactical opportunities."},
+      {name:"Wall", emoji:"🧱",
+       desc:"Tries to obstruct your progress."},
+      {name:"Turtle", emoji:"🐢",
+       desc:"Moves cautiously and patiently."},
+      {name:"Predictor", emoji:"🔮",
+       desc:"Attempts to anticipate your next move."},
+      {name:"Repeater", emoji:"🔁",
+       desc:"Explores recurring positions and repetition."},
+      {name:"Teacher", emoji:"📚",
+       desc:"Will explain its moves when explanations are implemented."},
+      {name:"Chaos", emoji:"🌪️",
+       desc:"Prefers unusual, unpredictable legal moves."},
+      {name:"Champion", emoji:"👑",
+       desc:"Aiming for the strongest available play."}
+    ];
+
+    let selected = "Balanced";
+
+    const botsElement = document.getElementById("bots");
+    const ratingElement = document.getElementById("rating");
+    const eloElement = document.getElementById("elo");
+    const difficultyElement = document.getElementById("difficulty");
+
+    function getDifficulty(elo) {
+      if (elo < 500) return "Very Easy";
+      if (elo < 1000) return "Medium";
+      if (elo < 1500) return "Intermediate";
+      if (elo < 2000) return "Hard";
+      if (elo < 2500) return "Very Hard";
+      if (elo < 3000) return "Expert";
+      if (elo < 3500) return "Master";
+      return "Maximum";
+    }
+
+    function selectBot(name) {
+      selected = name;
+      renderBots();
+      updateSummary();
+    }
+
+    function renderBots() {
+      botsElement.innerHTML = "";
+
+      personalities.forEach(bot => {
+        const button = document.createElement("button");
+        button.className = "bot" +
+          (selected === bot.name ? " selected" : "");
+        button.innerHTML =
+          '<span class="emoji">' + bot.emoji + '</span>' +
+          '<strong>' + bot.name + '</strong>' +
+          '<div class="description">' + bot.desc + '</div>';
+
+        button.setAttribute("aria-pressed",
+          String(selected === bot.name));
+        button.addEventListener("click", () => selectBot(bot.name));
+        botsElement.appendChild(button);
+      });
+    }
+
+    function updateSummary() {
+      const bot = personalities.find(b => b.name === selected);
+      const elo = Number(ratingElement.value);
+
+      eloElement.textContent = elo;
+      difficultyElement.textContent = getDifficulty(elo);
+      document.getElementById("summary").textContent =
+        selected + " Bot · " + elo + " Elo";
+      document.getElementById("description").textContent = bot.desc;
+    }
+
+    ratingElement.addEventListener("input", updateSummary);
+
+    document.getElementById("play").addEventListener("click", () => {
+      document.getElementById("status").textContent =
+        "Next step: connect the selected bot and rating to game.html. " +
+        "No AI game has started yet.";
+    });
+
+    renderBots();
+    updateSummary();
+  </script>
+</body>
+</html>
