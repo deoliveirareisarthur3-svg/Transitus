@@ -482,8 +482,10 @@ let moveCount = 0;
           }
 
           return;
-          
+        }
+
         // Clicking another one of your pieces selects it instead.
+        
         if (board[index] === turn) {
           selected = index;
           statusElement.textContent = "Choose a highlighted square.";
@@ -568,6 +570,6 @@ let moveCount = 0;
       makeBotMove();
     }
       
-  <script>
+  </script>
 </body>
 </html>
