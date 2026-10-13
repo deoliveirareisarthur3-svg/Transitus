@@ -376,24 +376,20 @@ const move = window.TransitusAI.chooseMove(
     position => position === key
   ).length;
 
-  if (occurrences === 1 && repetitionStarter === null) {
-    repetitionStarter = turn;
-  }
-
   positionHistory.push(key);
 
-  if (occurrences >= 2) {
-    const loser = repetitionStarter === "W" ? "White" : "Black";
-    const winner = repetitionStarter === "W" ? "Black" : "White";
+ if (occurrences >= 2) {
+  const loser = lastPlayer;
+  const winner = loser === "W" ? "Black" : "White";
 
-    endGame(
-      "Threefold repetition! " + loser +
-      ", who started the repetition, loses. " +
-      winner + " wins!"
-    );
-    return;
-  }
-
+  endGame(
+    "Threefold repetition! " +
+    (loser === "W" ? "White" : "Black") +
+    " caused the repetition and loses. " +
+    winner + " wins!"
+  );
+  return;
+}
   if (moveCount >= 240) {
     endGame("Draw! The 120-turn limit has been reached.");
     return;
