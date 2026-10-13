@@ -298,6 +298,98 @@ let moveCount = 0;
 
       return false;
     }
+    function makeBotMove() {
+  if (!botMode || gameOver || turn !== botColor) return;
+
+  if (!window.TransitusAI) {
+    statusElement.textContent =
+      "Error: The AI file did not load. Check ai.js.";
+    return;
+  }
+
+  const move = window.TransitusAI.chooseMove(
+    board.slice(),
+    botColor,
+    { depth: 3 }
+  );
+
+  if (!move) {
+    endGame(
+      (botColor === "W" ? "White" : "Black") +
+      " has no legal moves. The bot loses!"
+    );
+    return;
+  }
+
+  const movingPiece = board[move.from];
+
+  board[move.to] = movingPiece;
+  board[move.from] = null;
+  moveCount++;
+
+  const row = Math.floor(move.to / 8);
+
+  if (
+    (movingPiece === "W" && row === 0) ||
+    (movingPiece === "B" && row === 7)
+  ) {
+    endGame(
+      (botColor === "W" ? "White" : "Black") +
+      " wins by reaching the opposite end!"
+    );
+    return;
+  }
+
+  const lastPlayer = turn;
+  turn = turn === "W" ? "B" : "W";
+
+  if (!hasMoves(turn)) {
+    const stuckName = turn === "W" ? "White" : "Black";
+    const lastName = lastPlayer === "W" ? "White" : "Black";
+
+    endGame(
+      stuckName + " has no legal moves. " +
+      lastName + ", the last player to move, loses! " +
+      stuckName + " wins!"
+    );
+    return;
+  }
+
+  const key = positionKey();
+  const occurrences = positionHistory.filter(
+    position => position === key
+  ).length;
+
+  if (occurrences === 1 && repetitionStarter === null) {
+    repetitionStarter = turn;
+  }
+
+  positionHistory.push(key);
+
+  if (occurrences >= 2) {
+    const loser = repetitionStarter === "W" ? "White" : "Black";
+    const winner = repetitionStarter === "W" ? "Black" : "White";
+
+    endGame(
+      "Threefold repetition! " + loser +
+      ", who started the repetition, loses. " +
+      winner + " wins!"
+    );
+    return;
+  }
+
+  if (moveCount >= 240) {
+    endGame("Draw! The 120-turn limit has been reached.");
+    return;
+  }
+
+  statusElement.textContent =
+    "Your turn! Choose a " +
+    (turn === "W" ? "White" : "Black") +
+    " piece to move.";
+
+  render();
+}
 
     function endGame(message) {
       gameOver = true;
