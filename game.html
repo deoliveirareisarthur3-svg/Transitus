@@ -398,8 +398,9 @@ let moveCount = 0;
       render();
     }
 
-    function clickSquare(index) {
-      if (gameOver) return;
+   function clickSquare(index) {
+  if (gameOver) return;
+  if (botMode && turn === botColor) return;
 
       if (selected !== null) {
         const moves = legalMoves(selected);
@@ -471,13 +472,17 @@ let moveCount = 0;
             return;
           }
 
-          statusElement.textContent = "Choose a " +
+           statusElement.textContent = "Choose a " +
             (turn === "W" ? "White" : "Black") + " piece to move.";
 
           render();
-          return;
-        }
 
+          if (botMode && turn === botColor && !gameOver) {
+            makeBotMove();
+          }
+
+          return;
+          
         // Clicking another one of your pieces selects it instead.
         if (board[index] === turn) {
           selected = index;
@@ -555,9 +560,14 @@ let moveCount = 0;
         "Full turns: " + Math.floor(moveCount / 2) + " / 120";
     }
 
-    restartButton.addEventListener("click", resetGame);
+ restartButton.addEventListener("click", resetGame);
 
     resetGame();
+
+    if (botMode && turn === botColor && !gameOver) {
+      makeBotMove();
+    }
+      
 <script src="ai.js"></script>
   <script>
 </body>
