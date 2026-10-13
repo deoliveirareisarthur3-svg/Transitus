@@ -229,6 +229,11 @@
 const botMode = params.has("personality");
 const playerColor = params.get("color") === "B" ? "B" : "W";
 const botColor = playerColor === "W" ? "B" : "W";
+  const botPersonality = params.get("personality") || "Balanced";
+const botElo = Math.max(
+  100,
+  Math.min(4000, Number(params.get("elo")) || 1000)
+);
 
 let board = [];
 let turn = "W";
@@ -308,11 +313,21 @@ let moveCount = 0;
     return;
   }
 
-  const move = window.TransitusAI.chooseMove(
-    board.slice(),
-    botColor,
-    { depth: 3 }
-  );
+const depth =
+  botElo < 500 ? 1 :
+  botElo < 1000 ? 2 :
+  botElo < 1800 ? 3 :
+  botElo < 2600 ? 4 : 5;
+
+const move = window.TransitusAI.chooseMove(
+  board.slice(),
+  botColor,
+  {
+    depth: depth,
+    personality: botPersonality,
+    elo: botElo
+  }
+);
 
   if (!move) {
     endGame(
